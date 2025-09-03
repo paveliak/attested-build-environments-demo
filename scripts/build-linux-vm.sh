@@ -34,10 +34,10 @@ chmod +x image-attestation
 cp image-attestation /usr/sbin/image-attestation
 
 echo Measuring rootfs
-"$SCRIPTPATH"/scripts/rootfs-measure-verity.sh
+"$SCRIPTPATH"/rootfs-measure-verity.sh
 
 echo Installing enlightened initramfs scripts and generate initramfs
-"$SCRIPTPATH"/initramfs/install.sh
+"$SCRIPTPATH"/../initramfs/install.sh
 mkinitramfs -o "$TMP_DRIVE_PATH/initrd-$(uname -r).img"
 
 echo Copying the kernel
