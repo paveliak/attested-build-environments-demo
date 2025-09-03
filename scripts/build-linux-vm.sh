@@ -10,7 +10,7 @@ if [ "$EUID" -ne 0 ]
 fi
 
 VM_USER="${VM_USER:-azureuser}"
-SSH_KEYS_URL="${SSH_KEYS_URL:-https://github.com/marcelamelara.keys}"
+SSH_KEYS_URL="${SSH_KEYS_URL:-https://github.com/paveliak.keys}"
 
 echo Installing software necessary for image build
 apt-get update
