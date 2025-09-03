@@ -8,7 +8,7 @@ permissions:
   contents: write
 jobs:
   image:
-    if: github.actor == 'chkimes'
+    if: github.actor == 'paveliak'
     runs-on: ubuntu-latest
 
     steps:
