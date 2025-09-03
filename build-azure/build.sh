@@ -37,6 +37,7 @@ echo "VM created with IP address: $IP_ADDR"
 echo "Making sure we can connect to the VM..."
 MAX_RETRIES=10
 RETRY_DELAY=10
+count=0
 while [ $count -lt $MAX_RETRIES ]; do
     ssh -o StrictHostKeyChecking=no -i ~/.ssh/id_rsa azureuser@$IP_ADDR "uname -a" && break
     count=$((count + 1))
