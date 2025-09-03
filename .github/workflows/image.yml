@@ -6,6 +6,7 @@ on:
 permissions:
   id-token: write
   contents: write
+  attestations: write
 jobs:
   image:
     if: github.actor == 'paveliak'
@@ -55,7 +56,7 @@ jobs:
         path: img/*
 
     - name: Generate provenance
-      uses: github-early-access/generate-build-provenance@5fb744556d7e95958990349de0ddb84909c219bb #main
+      uses: actions/attest-build-provenance@977bb373ede98d70efdf65b84cb5f73e068dcc2a #v3
       with:
         subject-path: img/*
     
