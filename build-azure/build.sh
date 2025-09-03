@@ -25,8 +25,8 @@ az vm create --resource-group $AZURE_RESOURCE_GROUP \
 
 cleanup() {
     echo "Cleaning up..."
-    #az vm delete --resource-group $AZURE_RESOURCE_GROUP --name $AZURE_VM_NAME --yes
-    #rm -f create.log
+    az vm delete --resource-group $AZURE_RESOURCE_GROUP --name $AZURE_VM_NAME --yes
+    rm -f create.log
 }
 
 trap 'cleanup' EXIT
@@ -53,8 +53,7 @@ fi
 echo "Copying files to VM..."
 scp -r -o StrictHostKeyChecking=no -i ~/.ssh/id_rsa "$SCRIPTPATH/../initramfs" azureuser@$IP_ADDR:
 scp -r -o StrictHostKeyChecking=no -i ~/.ssh/id_rsa "$SCRIPTPATH/../scripts"  azureuser@$IP_ADDR:
-#scp    -o StrictHostKeyChecking=no -i ~/.ssh/id_rsa "$SCRIPTPATH/client"  azureuser@$IP_ADDR:
-#scp    -o StrictHostKeyChecking=no -i ~/.ssh/id_rsa "$SCRIPTPATH/server"  azureuser@$IP_ADDR:
+scp    -o StrictHostKeyChecking=no -i ~/.ssh/id_rsa "$SCRIPTPATH/image-attestation"  azureuser@$IP_ADDR:
 
 echo "Building VM image..."
 ssh    -o StrictHostKeyChecking=no -i ~/.ssh/id_rsa azureuser@$IP_ADDR "sudo scripts/build-linux-vm.sh"
