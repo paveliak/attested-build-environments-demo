@@ -57,4 +57,4 @@ scp    -o StrictHostKeyChecking=no -i ~/.ssh/id_rsa "$SCRIPTPATH/image-attestati
 
 echo "Building VM image..."
 ssh    -o StrictHostKeyChecking=no -i ~/.ssh/id_rsa azureuser@$IP_ADDR "sudo scripts/build-linux-vm.sh"
-scp    -o StrictHostKeyChecking=no -i ~/.ssh/id_rsa azureuser@$IP_ADDR:~/image.tar.gz .
+scp    -o StrictHostKeyChecking=no -i ~/.ssh/id_rsa azureuser@$IP_ADDR:~/scripts/image.tar.gz .
