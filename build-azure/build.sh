@@ -34,6 +34,21 @@ trap 'cleanup' EXIT
 IP_ADDR=$(cat create.log | jq -r .publicIpAddress | tail -n 1)
 echo "VM created with IP address: $IP_ADDR"
 
+echo "Making sure we can connect to the VM..."
+MAX_RETRIES=10
+RETRY_DELAY=10
+while [ $count -lt $MAX_RETRIES ]; do
+    ssh -o StrictHostKeyChecking=no -i ~/.ssh/id_rsa azureuser@$IP_ADDR "uname -a" && break
+    count=$((count + 1))
+    echo "Retry $count/$MAX_RETRIES failed. Waiting $RETRY_DELAY seconds before next attempt..."
+    sleep $RETRY_DELAY
+done
+
+if [ $count -eq $MAX_RETRIES ]; then
+    echo "All $MAX_RETRIES attempts failed."
+    exit 1
+fi
+
 echo "Copying files to VM..."
 scp -r -o StrictHostKeyChecking=no -i ~/.ssh/id_rsa "$SCRIPTPATH/../initramfs" azureuser@$IP_ADDR:
 scp -r -o StrictHostKeyChecking=no -i ~/.ssh/id_rsa "$SCRIPTPATH/../scripts"  azureuser@$IP_ADDR:
