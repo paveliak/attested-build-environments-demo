@@ -36,9 +36,9 @@ echo "VM created with IP address: $IP_ADDR"
 
 echo "Copying files to VM..."
 scp -r -o StrictHostKeyChecking=no -i ~/.ssh/id_rsa "$SCRIPTPATH/../initramfs" azureuser@$IP_ADDR:
-scp    -o StrictHostKeyChecking=no -i ~/.ssh/id_rsa "$SCRIPTPATH/build-vm.sh"  azureuser@$IP_ADDR:
-scp    -o StrictHostKeyChecking=no -i ~/.ssh/id_rsa "$SCRIPTPATH/client"  azureuser@$IP_ADDR:
-scp    -o StrictHostKeyChecking=no -i ~/.ssh/id_rsa "$SCRIPTPATH/server"  azureuser@$IP_ADDR:
+scp -r -o StrictHostKeyChecking=no -i ~/.ssh/id_rsa "$SCRIPTPATH/../scripts"  azureuser@$IP_ADDR:
+#scp    -o StrictHostKeyChecking=no -i ~/.ssh/id_rsa "$SCRIPTPATH/client"  azureuser@$IP_ADDR:
+#scp    -o StrictHostKeyChecking=no -i ~/.ssh/id_rsa "$SCRIPTPATH/server"  azureuser@$IP_ADDR:
 
 echo "Building VM image..."
 ssh    -o StrictHostKeyChecking=no -i ~/.ssh/id_rsa azureuser@$IP_ADDR "sudo ../scripts/build-linux-vm.sh"
