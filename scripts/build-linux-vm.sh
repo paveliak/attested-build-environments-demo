@@ -40,6 +40,8 @@ echo Installing enlightened initramfs scripts and generate initramfs
 "$SCRIPTPATH"/../initramfs/install.sh
 mkinitramfs -o "$TMP_DRIVE_PATH/initrd-$(uname -r).img"
 
+TMP_DRIVE_PATH=$(mktemp -d)
+
 echo Copying the kernel
 cp "/boot/vmlinuz-$(uname -r)" $TMP_DRIVE_PATH
 
