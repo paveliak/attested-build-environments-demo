@@ -37,7 +37,6 @@ echo Measuring rootfs
 "$SCRIPTPATH"/rootfs-measure-verity.sh
 
 echo Installing enlightened initramfs scripts and generate initramfs
-echo "TMP_DRIVE_PATH=$TMP_DRIVE_PATH"
 TMP_DRIVE_PATH=$(mktemp -d)
 "$SCRIPTPATH"/../initramfs/install.sh
 mkinitramfs -o "$TMP_DRIVE_PATH/initrd-$(uname -r).img"
