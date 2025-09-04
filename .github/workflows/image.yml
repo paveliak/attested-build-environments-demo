@@ -26,7 +26,6 @@ jobs:
         cd attest
         go get ./...
         go build -o ../build-azure ./...
-        ls -al ../build-azure
 
     - name: Login to Azure
       uses: azure/login@a457da9ea143d694b1b9c7c869ebb04ebe844ef5 # v2
