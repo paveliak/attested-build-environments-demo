@@ -35,7 +35,7 @@ jobs:
       # kernel, build platform client, build executor, and root filesystem.
       - name: Attest container reference values
         id: ref-values
-        uses: chkimes/image-attestation/.github/actions/attest-ref-values@main
+        uses: ./.github/actions/attest-ref-values
         with:
           reference-path: 'build-container/*'
 
