@@ -14,7 +14,7 @@ SSH_KEYS_URL="${SSH_KEYS_URL:-https://github.com/$VM_USER.keys}"
 
 echo Installing software desired for the eventual image
 apt-get update
-apt-get install -y golang tpm2-tools
+apt-get install -y golang tpm2-tools systemd-boot systemd-ukify
 
 echo "Setting public keys from $SSH_KEYS_URL"
 mkdir -p /home/$VM_USER/.ssh
@@ -37,19 +37,28 @@ TMP_DRIVE_PATH=$(mktemp -d)
 "$SCRIPTPATH"/../initramfs/install.sh
 mkinitramfs -o "$TMP_DRIVE_PATH/initrd.img-$(uname -r)"
 
-echo Copying the kernel
-cp "/boot/vmlinuz-$(uname -r)" $TMP_DRIVE_PATH
+#echo Copying the kernel
+#cp "/boot/vmlinuz-$(uname -r)" $TMP_DRIVE_PATH
 
-echo Creating tarball
-tar -czf "$SCRIPTPATH"/image.tar.gz -C $TMP_DRIVE_PATH .
+#echo Creating tarball
+#tar -czf "$SCRIPTPATH"/image.tar.gz -C $TMP_DRIVE_PATH .
 
 echo Updating initramfs
 sudo cp "$TMP_DRIVE_PATH/initrd.img-$(uname -r)" /boot/
 
-echo Enabling initramfs
-sudo sed -i '/^GRUB_FORCE_PARTUUID/ s/^/#/' /etc/default/grub.d/40-force-partuuid.cfg
+#echo Enabling initramfs
+#sudo sed -i '/^GRUB_FORCE_PARTUUID/ s/^/#/' /etc/default/grub.d/40-force-partuuid.cfg
 #sudo sed -i 's/^GRUB_RECORDFAIL_TIMEOUT=.*/GRUB_RECORDFAIL_TIMEOUT=0/' /etc/default/grub.d/50-cloudimg-settings.cfg
-sudo update-grub
+#sudo update-grub
 
-echo Disabling grubenv
-sudo rm /boot/grub/grubenv
+#echo Disabling grubenv
+#sudo rm /boot/grub/grubenv
+
+echo Building UKI
+PROC_CMDLINE=$(cat /proc/cmdline | sed -E 's/ *BOOT_IMAGE=[^ ]*//g' | sed 's/^[[:space:]]*//')
+sudo ukify build --linux="/boot/vmlinuz-$(uname -r)" --initrd="/boot/initrd.img-$(uname -r)" --uname=$(uname -r) --cmdline="$PROC_CMDLINE" --output=/boot/efi/EFI/BOOT/BOOTX64.EFI --all
+
+echo Clearing NVRAM
+for i in $(sudo efibootmgr | grep "^Boot[0-9A-Fa-f]\{4\}\*" | awk '{print $1}' | sed 's/Boot\([0-9A-Fa-f]*\).*/\1/'); do
+  sudo efibootmgr -b $i -B
+done
