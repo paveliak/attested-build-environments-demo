@@ -4,25 +4,29 @@ set -e
 
 # TODO: pass it into this script as parameter
 LUN_ID="0"
-# TODO: Look it up by 'cloudimg-rootfs' partition label
-ROOTFS_DEVICE="/dev/disk/azure/scsi1/lun${LUN_ID}-part1"
-# TODO: Look it up by 'verity-tree' GPT partition name
-VERITY_DEVICE="/dev/disk/azure/scsi1/lun${LUN_ID}-part2"
-# TODO: Look it up by 'UEFI' partition label
-UEFI_DEVICE="/dev/disk/azure/scsi1/lun${LUN_ID}-part15"
+
+ROOTFS_DEVICE=$(sudo blkid /dev/disk/azure/scsi1/lun0* --match-token LABEL=cloudimg-rootfs -o device)
+UEFI_DEVICE=$(sudo blkid /dev/disk/azure/scsi1/lun0* --match-token LABEL=UEFI -o device)
+BOOT_DEVICE=$(sudo blkid /dev/disk/azure/scsi1/lun0* --match-token LABEL=BOOT -o device)
+VERITY_DEVICE=$(sudo blkid /dev/disk/azure/scsi1/lun0* --match-token PARTLABEL=verity-tree -o device)
+
+sudo mkdir -p /mnt/root
+sudo mount -o ro $ROOTFS_DEVICE /mnt/root
+
+sudo mkdir -p /mnt/boot
+sudo mount -o ro $BOOT_DEVICE /mnt/boot
 
 sudo mkdir -p /mnt/uefi
 sudo mount $UEFI_DEVICE /mnt/uefi
 
 echo "Setting up Verity for $ROOTFS_DEVICE on $VERITY_DEVICE"
-sudo mkdir -p /mnt/uefi/verity
-sudo veritysetup --verbose --debug format /dev/disk/azure/scsi1/lun0-part1 /dev/disk/azure/scsi1/lun0-part2 --root-hash-file /mnt/uefi/verity/rootfs.hash
+sudo veritysetup --verbose --debug format $ROOTFS_DEVICE $VERITY_DEVICE --root-hash-file rootfs.hash
 
-#PROC_CMDLINE=$(cat /proc/cmdline | sed -E 's/ *BOOT_IMAGE=[^ ]*//g' | sed 's/^[[:space:]]*//')
-#sudo ukify build --linux=/boot/vmlinuz --initrd=/boot/initrd.img --uname=$(uname -r) --cmdline="$PROC_CMDLINE" --output=/boot/vmlinuz.efi --all
-
-blkid -s UUID -o value $ROOTFS_DEVICE | sudo tee /mnt/uefi/verity/rootfs.uuid
-blkid -s UUID -o value $VERITY_DEVICE | sudo tee /mnt/uefi/verity/verityfs.uuid
-echo "slsa-verity" | sudo tee /mnt/uefi/verity/verity.name
+echo "Building UKI"
+PROC_CMDLINE="root=PARTUUID=$(blkid -s PARTUUID -o value $ROOTFS_DEVICE) ro veritydata=PARTUUID=$(sudo blkid -s PARTUUID -o value $ROOTFS_DEVICE) veritytree=PARTUUID=$(sudo blkid -s PARTUUID -o value $VERITY_DEVICE) verityhash=$(cat rootfs.hash) verityname=/dev/meow"
+UNAME=$(ls /mnt/root/usr/lib/modules)
+sudo ukify build --linux="/mnt/boot/vmlinuz-$UNAME" --initrd="/mnt/boot/initrd.img-$UNAME" --uname=$UNAME --cmdline="$PROC_CMDLINE" --output=/mnt/uefi/EFI/BOOT/BOOTX64.EFI --all
 
 sudo umount /mnt/uefi
+sudo umount /mnt/boot
+sudo umount /mnt/root
