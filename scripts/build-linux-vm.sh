@@ -54,9 +54,10 @@ sudo cp "$TMP_DRIVE_PATH/initrd.img-$(uname -r)" /boot/
 #echo Disabling grubenv
 #sudo rm /boot/grub/grubenv
 
-echo Building UKI
-PROC_CMDLINE=$(cat /proc/cmdline | sed -E 's/ *BOOT_IMAGE=[^ ]*//g' | sed 's/^[[:space:]]*//')
-sudo ukify build --linux="/boot/vmlinuz-$(uname -r)" --initrd="/boot/initrd.img-$(uname -r)" --uname=$(uname -r) --cmdline="$PROC_CMDLINE" --output=/boot/efi/EFI/BOOT/BOOTX64.EFI --all
+#echo Building UKI
+cat /proc/cmdline
+#PROC_CMDLINE=$(cat /proc/cmdline | sed -E 's/ *BOOT_IMAGE=[^ ]*//g' | sed 's/^[[:space:]]*//')
+#sudo ukify build --linux="/boot/vmlinuz-$(uname -r)" --initrd="/boot/initrd.img-$(uname -r)" --uname=$(uname -r) --cmdline="$PROC_CMDLINE" --output=/boot/efi/EFI/BOOT/BOOTX64.EFI --all
 
 echo Clearing NVRAM
 for i in $(sudo efibootmgr | grep "^Boot[0-9A-Fa-f]\{4\}\*" | awk '{print $1}' | sed 's/Boot\([0-9A-Fa-f]*\).*/\1/'); do
