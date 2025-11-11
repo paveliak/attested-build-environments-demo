@@ -53,7 +53,7 @@ az vm disk attach --resource-group $AZURE_RESOURCE_GROUP --vm-name $HASHER_VM_NA
 echo "Setting up Verity..."
 scp -r -o StrictHostKeyChecking=no -i ~/.ssh/id_rsa "$SCRIPTPATH/../scripts"  "${VM_USER}@${IP_ADDR}":
 ssh    -o StrictHostKeyChecking=no -i ~/.ssh/id_rsa "${VM_USER}@${IP_ADDR}" "sudo scripts/rootfs-prepare-verity.sh"
-#ssh    -o StrictHostKeyChecking=no -i ~/.ssh/id_rsa "${VM_USER}@${IP_ADDR}" "sudo scripts/rootfs-measure-verity.sh"
+ssh    -o StrictHostKeyChecking=no -i ~/.ssh/id_rsa "${VM_USER}@${IP_ADDR}" "sudo scripts/rootfs-measure-verity.sh"
 
 #echo "Deleting hasher VM..."
 #az vm delete --id $HASHER_VM_ID --yes
