@@ -18,6 +18,9 @@ echo "Setting up Verity for $ROOTFS_DEVICE on $VERITY_DEVICE"
 sudo mkdir -p /mnt/uefi/verity
 sudo veritysetup --verbose --debug format /dev/disk/azure/scsi1/lun0-part1 /dev/disk/azure/scsi1/lun0-part2 --root-hash-file /mnt/uefi/verity/rootfs.hash
 
+#PROC_CMDLINE=$(cat /proc/cmdline | sed -E 's/ *BOOT_IMAGE=[^ ]*//g' | sed 's/^[[:space:]]*//')
+#sudo ukify build --linux=/boot/vmlinuz --initrd=/boot/initrd.img --uname=$(uname -r) --cmdline="$PROC_CMDLINE" --output=/boot/vmlinuz.efi --all
+
 blkid -s UUID -o value $ROOTFS_DEVICE | sudo tee /mnt/uefi/verity/rootfs.uuid
 blkid -s UUID -o value $VERITY_DEVICE | sudo tee /mnt/uefi/verity/verityfs.uuid
 echo "slsa-verity" | sudo tee /mnt/uefi/verity/verity.name
