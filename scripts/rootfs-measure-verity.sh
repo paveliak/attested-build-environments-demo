@@ -15,6 +15,7 @@ VERITY_PARTUUID=$(sudo blkid -s PARTUUID -o value $VERITY_DEVICE)
 
 echo "Setting up Verity for $ROOTFS_DEVICE on $VERITY_DEVICE"
 #sudo veritysetup --verbose --debug format $ROOTFS_DEVICE $VERITY_DEVICE --root-hash-file rootfs.hash
+echo "foobar" > rootfs.hash 
 
 echo "Building UKI"
 sudo mkdir -p /mnt/root
