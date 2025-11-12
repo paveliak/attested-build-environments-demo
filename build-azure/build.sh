@@ -23,7 +23,6 @@ scp    -o StrictHostKeyChecking=no -i ~/.ssh/id_rsa "$SCRIPTPATH/image-attestati
 
 echo "Building VM image..."
 ssh    -o StrictHostKeyChecking=no -i ~/.ssh/id_rsa "${VM_USER}@${IP_ADDR}" "sudo SSH_KEYS_URL=$SSH_KEYS_URL scripts/build-linux-vm.sh"
-#scp    -o StrictHostKeyChecking=no -i ~/.ssh/id_rsa "${VM_USER}@${IP_ADDR}":~/scripts/image.tar.gz .
 
 echo "Deallocating image VM..."
 az vm deallocate --id $IMAGE_VM_ID
