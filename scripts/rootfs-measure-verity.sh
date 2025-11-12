@@ -29,7 +29,8 @@ PROC_CMDLINE="root=PARTUUID=$ROOTFS_PARTUUID ro veritydata=PARTUUID=$ROOTFS_PART
 UNAME=$(ls /mnt/root/usr/lib/modules)
 # TODO: sign UKI for the SecureBoot
 echo "Kernel cmdline: $PROC_CMDLINE"
-sudo ukify build --linux="/mnt/boot/vmlinuz-$UNAME" --initrd="/mnt/boot/initrd.img-$UNAME" --uname=$UNAME --cmdline="$PROC_CMDLINE" --output=/mnt/uefi/EFI/BOOT/BOOTX64.EFI --all
+sudo ukify build --linux="/mnt/boot/vmlinuz-$UNAME" --initrd="/mnt/boot/initrd.img-$UNAME" --uname=$UNAME --cmdline="$PROC_CMDLINE" --output=uki.efi --all
+sudo cp uki.efi /mnt/uefi/EFI/BOOT/BOOTX64.EFI
 
 sudo umount /mnt/uefi
 sudo umount /mnt/boot
