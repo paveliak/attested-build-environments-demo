@@ -58,9 +58,13 @@ ssh    -o StrictHostKeyChecking=no -i ~/.ssh/id_rsa "${VM_USER}@${IP_ADDR}" "sud
 echo "Fetching enlightened kernel"
 scp    -o StrictHostKeyChecking=no -i ~/.ssh/id_rsa "${VM_USER}@${IP_ADDR}":~/uki.efi .
 
-#echo "Deleting hasher VM..."
-#az vm delete --id $HASHER_VM_ID --yes
+echo "Deleting hasher VM..."
+az vm delete --id $HASHER_VM_ID --yes
 
-#echo "Attaching OS disk back..."
-#az vm update --name $IMAGE_VM_NAME --resource-group $AZURE_RESOURCE_GROUP --os-disk $DISK_ID
-#az disk delete --id $SWAP_DISK_ID --yes
+echo "Attaching OS disk back..."
+az vm update --name $IMAGE_VM_NAME --resource-group $AZURE_RESOURCE_GROUP --os-disk $DISK_ID
+az disk delete --id $SWAP_DISK_ID --yes
+
+# TODO (UKI is not signed)
+echo Disabling SecureBoot
+az vm update --name $IMAGE_VM_NAME --resource-group $AZURE_RESOURCE_GROUP --set securityProfile.uefiSettings.secureBootEnabled=false

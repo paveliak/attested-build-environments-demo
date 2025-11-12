@@ -29,6 +29,7 @@ PROC_CMDLINE="root=PARTUUID=$ROOTFS_PARTUUID ro veritydata=PARTUUID=$ROOTFS_PART
 UNAME=$(ls /mnt/root/usr/lib/modules)
 # TODO: sign UKI for the SecureBoot
 echo "Kernel cmdline: $PROC_CMDLINE"
+# We could also build UKI within the Image VM and create UKI addon here for the kernel command line 
 sudo ukify build --linux="/mnt/boot/vmlinuz-$UNAME" --initrd="/mnt/boot/initrd.img-$UNAME" --uname=$UNAME --cmdline="$PROC_CMDLINE" --output=uki.efi --all
 sudo cp uki.efi /mnt/uefi/EFI/BOOT/BOOTX64.EFI
 
