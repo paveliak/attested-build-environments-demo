@@ -28,6 +28,7 @@ sudo mount $UEFI_DEVICE /mnt/uefi
 PROC_CMDLINE="root=PARTUUID=$ROOTFS_PARTUUID ro veritydata=PARTUUID=$ROOTFS_PARTUUID veritytree=PARTUUID=$VERITY_PARTUUID verityhash=$(cat rootfs.hash) verityname=/dev/meow"
 UNAME=$(ls /mnt/root/usr/lib/modules)
 # TODO: sign UKI for the SecureBoot
+echo "Kernel cmdline: $PROC_CMDLINE"
 sudo ukify build --linux="/mnt/boot/vmlinuz-$UNAME" --initrd="/mnt/boot/initrd.img-$UNAME" --uname=$UNAME --cmdline="$PROC_CMDLINE" --output=/mnt/uefi/EFI/BOOT/BOOTX64.EFI --all
 
 sudo umount /mnt/uefi
