@@ -16,6 +16,8 @@ case "${1}" in
 		;;
 esac
 
+exit 0
+
 echo "Reading verity configuration"
 mkdir -p /boot/efi
 mount -t vfat -o ro /dev/disk/by-label/UEFI /boot/efi
