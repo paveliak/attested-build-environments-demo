@@ -15,6 +15,7 @@ az vm create --resource-group $AZURE_RESOURCE_GROUP \
              --admin-username $VM_USER \
              --ssh-key-value ~/.ssh/id_rsa.pub \
              --size Standard_D4ds_v5 \
+             --storage-sku StandardSSD_LRS \
              --security-type TrustedLaunch \
              --nic-delete-option delete \
              --os-disk-delete-option delete \
