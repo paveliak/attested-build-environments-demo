@@ -16,18 +16,18 @@ case "${1}" in
 		;;
 esac
 
-exit 0
-
 echo "Reading verity configuration"
-mkdir -p /boot/efi
-mount -t vfat -o ro /dev/disk/by-label/UEFI /boot/efi
 
-if [ -e "/boot/efi/verity/verity.name" ]; then
-    VERITYNAME=$(cat /boot/efi/verity/verity.name)
-    echo "VERITYNAME $VERITYNAME"
-fi
-
-umount /boot/efi
+for x in $(cat /proc/cmdline); do
+        case ${x} in
+        verityname=*)
+                VERITYNAME=${x#*=}
+        ;;
+        overlaydev=*)
+                OVERLAYDEV=${x#*=}
+        ;;
+        esac
+done
 
 if [ -z "$VERITYNAME" ]; then
     echo "Verity not configured. Bypassing overlay creation."
@@ -41,14 +41,12 @@ if [ ! -e "/dev/mapper/$VERITYNAME" ]; then
     exit 0
 fi
 
-# TODO Discover it by 'LABEL="Temporary Storage"'
-OVERLAYDEV="/dev/sdb1"
-
 if [ -z "$OVERLAYDEV" ]; then
-    echo "Overlay settings incorrect! Must supply overlaydev"
-    /scripts/measure-event "OVERLAY_FAILURE"
-    exit 1
+    echo "Using temporary disk for the overlay device"
+    OVERLAYDEV="/dev/disk/azure/resource-part1"
 fi
+
+exit 0
 
 # ignore whatever the initramfs scripts did
 echo Un-mounting existing /root
