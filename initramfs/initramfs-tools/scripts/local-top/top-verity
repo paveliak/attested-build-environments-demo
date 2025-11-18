@@ -113,6 +113,3 @@ else
     echo "Verity device created!"
     /scripts/measure-event "VERITY_SUCCESS"
 fi
-
-echo "Closing verity device"
-veritysetup -v close "$VERITYNAME"
