@@ -16,8 +16,6 @@ case "${1}" in
 		;;
 esac
 
-exit 0
-
 echo "Reading verity configuration from $(cat /proc/cmdline)"
 for x in $(cat /proc/cmdline); do
         case ${x} in
@@ -94,13 +92,15 @@ if [ $SETTINGS_COUNT -ne 4 ]; then
     exit 1
 fi
 
-#echo "Verifying verity hashes"
-#ret=0
-#veritysetup --verbose --debug verify "$VERITYDATADEV" "$VERITYTREEDEV" "$VERITYHASH" || ret=$?
-#if [ $ret -ne 0 ]; then
-#    echo "veritysetup verification failed!"
-#    exit 1
-#fi
+echo "Verifying verity hashes"
+ret=0
+veritysetup --verbose --debug verify "$VERITYDATADEV" "$VERITYTREEDEV" "$VERITYHASH" || ret=$?
+if [ $ret -ne 0 ]; then
+    echo "veritysetup verification failed!"
+    exit 1
+fi
+
+exit 0
 
 echo "Opening verity device"
 /scripts/measure-event "VERITY_HASH: $VERITYHASH"
