@@ -16,6 +16,135 @@ case "${1}" in
 		;;
 esac
 
+echo "Reading verity configuration from $(cat /proc/cmdline)"
+for x in $(cat /proc/cmdline); do
+        case ${x} in
+        veritydata=*)
+                value=${x#*=}
+
+                # Find the device node path depending on the form of veritydata= :
+                case ${value} in
+                UUID=*)
+                        VERITYDATADEV=/dev/disk/by-uuid/${value#UUID=}
+                        ;;
+                PARTUUID=*)
+                        VERITYDATADEV=/dev/disk/by-partuuid/${value#PARTUUID=}
+                        ;;
+                LABEL=*)
+                        VERITYDATADEV=/dev/disk/by-label/${value#LABEL=}
+                        ;;
+                *)
+                        VERITYDATADEV=${value}
+                        ;;
+                esac
+        ;;
+        veritytree=*)
+                value=${x#*=}
+
+                # Find the device node path depending on the form of veritytree= :
+                case ${value} in
+                UUID=*)
+                        VERITYTREEDEV=/dev/disk/by-uuid/${value#UUID=}
+                        ;;
+                PARTUUID=*)
+                        VERITYTREEDEV=/dev/disk/by-partuuid/${value#PARTUUID=}
+                        ;;
+                LABEL=*)
+                        VERITYTREEDEV=/dev/disk/by-label/${value#LABEL=}
+                        ;;
+                *)
+                        VERITYTREEDEV=${value}
+                        ;;
+                esac
+        ;;
+        verityhash=*)
+                VERITYHASH=${x#*=}
+        ;;
+        verityname=*)
+                VERITYNAME=${x#*=}
+        ;;
+        overlaydev=*)
+                OVERLAYDEV=${x#*=}
+        ;;
+        esac
+done
+
+SETTINGS_COUNT=0
+if [ -n "$VERITYDATADEV" ]; then
+    SETTINGS_COUNT=$((SETTINGS_COUNT+1))
+fi
+if [ -n "$VERITYTREEDEV" ]; then
+    SETTINGS_COUNT=$((SETTINGS_COUNT+1))
+fi
+if [ -n "$VERITYHASH" ]; then
+    SETTINGS_COUNT=$((SETTINGS_COUNT+1))
+fi
+if [ -n "$VERITYNAME" ]; then
+    SETTINGS_COUNT=$((SETTINGS_COUNT+1))
+fi
+
+if [ $SETTINGS_COUNT -ne 4 ]; then
+    echo "Verity settings incorrect! Must supply veritydata, veritytree, verityhash, verityname"
+    exit 1
+fi
+
+if [ -z "$OVERLAYDEV" ]; then
+    echo "Using temporary disk for the overlay device"
+    OVERLAYDEV="/dev/disk/azure/resource-part1"
+fi
+
+#echo "Verifying verity hashes"
+#ret=0
+#veritysetup --verbose --debug verify "$VERITYDATADEV" "$VERITYTREEDEV" "$VERITYHASH" || ret=$?
+#if [ $ret -ne 0 ]; then
+#    echo "veritysetup verification failed!"
+#    exit 1
+#fi
+
+# ignore whatever the initramfs scripts did
+echo Un-mounting existing /root
+umount /root
+
+echo "Opening verity device"
+ret=0
+veritysetup -v open "$VERITYDATADEV" "$VERITYNAME" "$VERITYTREEDEV" "$VERITYHASH" || ret=$?
+
+if [ $ret -ne 0 ]; then
+    echo "veritysetup failed!"
+    exit 1
+else
+    echo "Verity device created!"
+fi
+
+echo Mounting verity device to /roroot
+mkdir -p /roroot
+mount "/dev/mapper/$VERITYNAME" /roroot
+
+# TODO: in a real implementation, encrypt the device
+
+echo Ensuring overlay device "$OVERLAYDEV" is ext4
+ret=0
+blkid "$OVERLAYDEV" | grep TYPE=\"ext4\" || ret=$?
+
+if [ $ret -ne 0 ]; then
+    echo "Overlay device is not ext4! Clobbering..."
+    mkfs.ext4 -F "$OVERLAYDEV"
+fi
+
+# create/mount our overlayfs work and upper directories
+mkdir -p /mnt/overlay
+mount -w "$OVERLAYDEV" /mnt/overlay
+mkdir -p /mnt/overlay/work
+mkdir -p /mnt/overlay/upper
+mount -t overlay overlay -o lowerdir=/roroot,workdir=/mnt/overlay/work,upperdir=/mnt/overlay/upper "${rootmnt?}"
+
+echo "OverlayFS created!"
+
+mkdir -p /root/measurements
+cp /measurements/eventlog /root/measurements
+
+exit 0
+
 echo "Reading verity configuration"
 
 for x in $(cat /proc/cmdline); do

@@ -16,6 +16,8 @@ case "${1}" in
 		;;
 esac
 
+exit 0
+
 echo "Reading verity configuration from $(cat /proc/cmdline)"
 for x in $(cat /proc/cmdline); do
         case ${x} in
