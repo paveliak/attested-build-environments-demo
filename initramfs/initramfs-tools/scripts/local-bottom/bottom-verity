@@ -101,6 +101,8 @@ fi
 #    exit 1
 #fi
 
+mount
+
 # ignore whatever the initramfs scripts did
 echo Un-mounting existing /root
 umount /root
@@ -115,6 +117,8 @@ if [ $ret -ne 0 ]; then
 else
     echo "Verity device created!"
 fi
+
+ls -al "/dev/mapper/$VERITYNAME"
 
 echo Mounting verity device to /roroot
 mkdir -p /roroot
