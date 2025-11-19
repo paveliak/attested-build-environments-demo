@@ -93,13 +93,13 @@ if [ -z "$OVERLAYDEV" ]; then
     OVERLAYDEV="/dev/disk/azure/resource-part1"
 fi
 
-#echo "Verifying verity hashes"
-#ret=0
-#veritysetup --verbose --debug verify "$VERITYDATADEV" "$VERITYTREEDEV" "$VERITYHASH" || ret=$?
-#if [ $ret -ne 0 ]; then
-#    echo "veritysetup verification failed!"
-#    exit 1
-#fi
+echo "Verifying verity hashes"
+ret=0
+veritysetup --verbose --debug verify "$VERITYDATADEV" "$VERITYTREEDEV" "$VERITYHASH" || ret=$?
+if [ $ret -ne 0 ]; then
+    echo "veritysetup verification failed!"
+    exit 1
+fi
 
 mount
 
