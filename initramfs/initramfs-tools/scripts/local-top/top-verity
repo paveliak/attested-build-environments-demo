@@ -81,13 +81,11 @@ if [ -n "$VERITYNAME" ]; then
 fi
 
 if [ $SETTINGS_COUNT -eq 0 ]; then
-#    /scripts/measure-event "VERITY_BYPASS"
     echo "No verity settings"
-    exit 0
+    exit 1
 fi
 
 if [ $SETTINGS_COUNT -ne 4 ]; then
-#    /scripts/measure-event "VERITY_FAILURE"
     echo "Verity settings incorrect! Must supply veritydata, veritytree, verityhash, verityname"
     exit 1
 fi
@@ -100,16 +98,11 @@ fi
 #    exit 1
 #fi
 
-#echo "Opening verity device"
-#/scripts/measure-event "VERITY_HASH: $VERITYHASH"
-
 ret=0
 veritysetup -v open "$VERITYDATADEV" "$VERITYNAME" "$VERITYTREEDEV" "$VERITYHASH" || ret=$?
 
 if [ $ret -ne 0 ]; then
     echo "veritysetup failed!"
-#    /scripts/measure-event "VERITY_FAILURE"
 else
     echo "Verity device created!"
-#    /scripts/measure-event "VERITY_SUCCESS"
 fi

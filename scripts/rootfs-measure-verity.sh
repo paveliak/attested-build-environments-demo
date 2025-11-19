@@ -25,9 +25,7 @@ sudo mount -o ro $ROOTFS_DEVICE /mnt/root
 sudo mount -o ro $BOOT_DEVICE /mnt/boot
 sudo mount $UEFI_DEVICE /mnt/uefi
 
-#root=PARTUUID=$ROOTFS_PARTUUID ro 
-#PROC_CMDLINE="console=tty1 console=ttyS0 earlyprintk=ttyS0 veritydata=PARTUUID=$ROOTFS_PARTUUID veritytree=PARTUUID=$VERITY_PARTUUID verityhash=$(cat rootfs.hash) verityname=verityroot"
-PROC_CMDLINE="root=/dev/mapper/verityroot ro fastboot rootfstype=ext4 console=tty1 console=ttyS0 earlyprintk=ttyS0 veritydata=/dev/sda1 veritytree=/dev/sda2 verityhash=$(cat rootfs.hash) verityname=verityroot"
+PROC_CMDLINE="root=/dev/mapper/verityroot ro fastboot rootfstype=ext4 console=tty1 console=ttyS0 earlyprintk=ttyS0 veritydata=PARTUUID=$ROOTFS_PARTUUID veritytree=PARTUUID=$VERITY_PARTUUID verityhash=$(cat rootfs.hash) verityname=verityroot"
 UNAME=$(ls /mnt/root/usr/lib/modules)
 # TODO: sign UKI for the SecureBoot
 echo "Kernel cmdline: $PROC_CMDLINE"
