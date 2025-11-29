@@ -27,11 +27,10 @@ sudo mount $UEFI_DEVICE /mnt/uefi
 
 PROC_CMDLINE="root=/dev/mapper/verityroot ro fastboot rootfstype=ext4 console=tty1 console=ttyS0 earlyprintk=ttyS0 veritydata=PARTUUID=$ROOTFS_PARTUUID veritytree=PARTUUID=$VERITY_PARTUUID verityhash=$(cat rootfs.hash) verityname=verityroot"
 UNAME=$(ls /mnt/root/usr/lib/modules)
-# TODO: sign UKI for the SecureBoot
 echo "Kernel cmdline: $PROC_CMDLINE"
-# We could also build UKI within the Image VM and create UKI addon here for the kernel command line 
-sudo ukify build --linux="/mnt/boot/vmlinuz-$UNAME" --initrd="/mnt/boot/initrd.img-$UNAME" --uname=$UNAME --cmdline="$PROC_CMDLINE" --output=uki.efi --all --measure > pcr11
-cat pcr11
+# We could also build UKI within the Image VM and create UKI addon here for the kernel command line
+openssl req -new -x509 -newkey rsa:2048 -keyout MOK.key -out MOK.pem -days 365 -nodes -subj "/CN=SLSA BuildEnv Demo/"
+sudo ukify build --linux="/mnt/boot/vmlinuz-$UNAME" --initrd="/mnt/boot/initrd.img-$UNAME" --uname=$UNAME --cmdline="$PROC_CMDLINE" --output=uki.efi --signtool=systemd-sbsign --secureboot-private-key=MOK.key --secureboot-certificate=MOK.pem
 sudo cp uki.efi /mnt/uefi/EFI/BOOT/BOOTX64.EFI
 
 sudo umount /mnt/uefi
