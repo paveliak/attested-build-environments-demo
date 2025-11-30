@@ -2,7 +2,7 @@ param location string
 param galleryName string
 param imageDefinitionName string
 param imageVersion string
-param managedDiskId string
+param sourceId string
 param mokCertBase64 string
 
 resource gallery 'Microsoft.Compute/galleries@2024-03-03' = {
@@ -39,7 +39,7 @@ resource imageVer 'Microsoft.Compute/galleries/images/versions@2024-03-03' = {
   properties: {
     storageProfile: {
       source: {
-        id: managedDiskId
+        id: sourceId
       }
     }
     securityProfile: {

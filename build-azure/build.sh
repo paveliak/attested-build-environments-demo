@@ -62,15 +62,15 @@ MOK_BASE64=$(sed '/-----BEGIN/d;/-----END/d' MOK.pem | tr -d '\n')
 echo "Deleting hasher VM..."
 az vm delete --id $HASHER_VM_ID --yes
 
+echo "Attaching OS disk back..."
+az vm update --name $IMAGE_VM_NAME --resource-group $AZURE_RESOURCE_GROUP --os-disk $DISK_ID
+az disk delete --id $SWAP_DISK_ID --yes
+
 echo "Creating image version..."
 az deployment group create \
   --resource-group $AZURE_RESOURCE_GROUP \
   --template-file "$SCRIPTPATH/image.bicep" \
-  --parameters location="$AZURE_LOCATION" galleryName="$AZURE_GALLERY_NAME" imageDefinitionName="$AZURE_IMAGE_DEFINITION" imageVersion="$AZURE_IMAGE_VERSION" managedDiskId="$DISK_ID" mokCertBase64="$MOK_BASE64"
-
-echo "Attaching OS disk back..."
-az vm update --name $IMAGE_VM_NAME --resource-group $AZURE_RESOURCE_GROUP --os-disk $DISK_ID
-az disk delete --id $SWAP_DISK_ID --yes
+  --parameters location="$AZURE_LOCATION" galleryName="$AZURE_GALLERY_NAME" imageDefinitionName="$AZURE_IMAGE_DEFINITION" imageVersion="$AZURE_IMAGE_VERSION" sourceId="$IMAGE_VM_ID" mokCertBase64="$MOK_BASE64"
 
 # TODO (UKI is not signed)
 echo Disabling SecureBoot
