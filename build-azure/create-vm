@@ -23,7 +23,7 @@ az vm create --resource-group $AZURE_RESOURCE_GROUP \
              --image $VM_IMAGE \
              --size Standard_D4ds_v5 \
              --storage-sku StandardSSD_LRS \
-             --security-type TrustedLaunch \
+             --security-type Standard \
              --nic-delete-option delete \
              --os-disk-delete-option delete \
              --patch-mode ImageDefault \
