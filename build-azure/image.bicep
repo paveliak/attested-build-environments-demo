@@ -39,7 +39,7 @@ resource imageVer 'Microsoft.Compute/galleries/images/versions@2024-03-03' = {
   properties: {
     storageProfile: {
       source: {
-        id: sourceId
+        virtualMachineId: sourceId
       }
     }
     securityProfile: {
