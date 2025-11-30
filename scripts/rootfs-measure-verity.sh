@@ -30,7 +30,7 @@ UNAME=$(ls /mnt/root/usr/lib/modules)
 echo "Kernel cmdline: $PROC_CMDLINE"
 # We could also build UKI within the Image VM and create UKI addon here for the kernel command line
 openssl req -new -x509 -newkey rsa:2048 -keyout MOK.key -out MOK.pem -days 365 -nodes -subj "/CN=SLSA BuildEnv Demo/"
-sudo ukify build --linux="/mnt/boot/vmlinuz-$UNAME" --initrd="/mnt/boot/initrd.img-$UNAME" --uname=$UNAME --cmdline="$PROC_CMDLINE" --output=uki.efi --signtool=systemd-sbsign --secureboot-private-key=MOK.key --secureboot-certificate=MOK.pem
+sudo ukify build --linux="/mnt/boot/vmlinuz-$UNAME" --initrd="/mnt/boot/initrd.img-$UNAME" --uname=$UNAME --cmdline="$PROC_CMDLINE" --output=uki.efi --signtool=sbsign --secureboot-private-key=MOK.key --secureboot-certificate=MOK.pem
 sudo cp uki.efi /mnt/uefi/EFI/BOOT/BOOTX64.EFI
 
 sudo umount /mnt/uefi
