@@ -4,6 +4,7 @@ set -e
 
 VM_NAME=$1
 VM_IMAGE=${2:-Canonical:ubuntu-24_04-lts:server:latest}
+VM_SECURITY=${3:-Standard}
 VM_USER=${AZURE_VM_USER:-azureuser}
 
 if ! [ -f ~/.ssh/id_rsa ]; then
@@ -23,7 +24,7 @@ az vm create --resource-group $AZURE_RESOURCE_GROUP \
              --image $VM_IMAGE \
              --size Standard_D4ds_v5 \
              --storage-sku StandardSSD_LRS \
-             --security-type Standard \
+             --security-type $VM_SECURITY \
              --nic-delete-option delete \
              --os-disk-delete-option delete \
              --patch-mode ImageDefault \

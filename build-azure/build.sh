@@ -31,7 +31,7 @@ echo "Detaching OS disk..."
 DISK_ID=$(az vm show --id $IMAGE_VM_ID | jq -r ".storageProfile.osDisk.managedDisk.id")
 IMAGE_ID=$(az disk show --id $DISK_ID | jq -r ".creationData.imageReference.id")
 SWAP_DISK_NAME="${AZURE_VM_NAME}-$(openssl rand -base64 12 | tr -dc 'A-Za-z0-9' | head -c 16 ; echo)"
-az disk create --image-reference $IMAGE_ID --resource-group $AZURE_RESOURCE_GROUP --name $SWAP_DISK_NAME --security-type Standard
+az disk create --image-reference $IMAGE_ID --resource-group $AZURE_RESOURCE_GROUP --name $SWAP_DISK_NAME --security-type Standard --hyper-v-generation V2
 SWAP_DISK_ID=$(az disk show --resource-group $AZURE_RESOURCE_GROUP --name $SWAP_DISK_NAME | jq -r ".id")
 az vm update --name $IMAGE_VM_NAME --resource-group $AZURE_RESOURCE_GROUP --os-disk $SWAP_DISK_ID
 
@@ -72,6 +72,5 @@ az deployment group create \
   --template-file "$SCRIPTPATH/image.bicep" \
   --parameters location="$AZURE_LOCATION" galleryName="$AZURE_GALLERY_NAME" imageDefinitionName="$AZURE_IMAGE_DEFINITION" imageVersion="$AZURE_IMAGE_VERSION" sourceId="$IMAGE_VM_ID" mokCertBase64="$MOK_BASE64"
 
-# TODO (UKI is not signed)
-echo Disabling SecureBoot
-az vm update --name $IMAGE_VM_NAME --resource-group $AZURE_RESOURCE_GROUP --set securityProfile.uefiSettings.secureBootEnabled=false
+echo "Deleting image VM..."
+az vm delete --id $IMAGE_VM_ID --yes

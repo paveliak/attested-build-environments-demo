@@ -6,7 +6,7 @@ SCRIPTPATH="$( cd "$(dirname "${BASH_SOURCE[0]}")" && pwd -P )"
 
 echo "Creating attested VM..."
 ATTEST_VM_NAME="${AZURE_VM_NAME}attest"
-$SCRIPTPATH/create-vm $ATTEST_VM_NAME $IMAGE_ID
+$SCRIPTPATH/create-vm $ATTEST_VM_NAME $IMAGE_ID TrustedLaunch
 ATTEST_VM_ID=$(az vm show --resource-group $AZURE_RESOURCE_GROUP --name $ATTEST_VM_NAME | jq -r ".id")
 
 echo "Attesting VM..."
