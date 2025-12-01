@@ -33,6 +33,9 @@ openssl req -new -x509 -newkey rsa:2048 -keyout MOK.key -out MOK.pem -days 365 -
 sudo ukify build --linux="/mnt/boot/vmlinuz-$UNAME" --initrd="/mnt/boot/initrd.img-$UNAME" --uname=$UNAME --cmdline="$PROC_CMDLINE" --output=uki.efi --signtool=sbsign --secureboot-private-key=MOK.key --secureboot-certificate=MOK.pem
 sudo cp uki.efi /mnt/uefi/EFI/BOOT/BOOTX64.EFI
 
+echo "Printing out PCRs"
+sudo tpm2_pcrread
+
 sudo umount /mnt/uefi
 sudo umount /mnt/boot
 sudo umount /mnt/root
