@@ -4,7 +4,7 @@ set -e
 
 echo Installing software necessary for verity measurement
 sudo apt update
-sudo apt-get install -y expect cryptsetup systemd-boot systemd-ukify
+sudo apt-get install -y expect cryptsetup systemd-boot systemd-ukify tpm2-tools
 
 echo Patching up fstab
 # Use UEFI label for the EFI partition instead of UUID
