@@ -3,15 +3,15 @@
 set -e
 
 VM_NAME=$1
-VM_IMAGE=${2:-Canonical:ubuntu-24_04-lts:server:latest}
-VM_SECURITY=${3:-Standard}
+VM_SECURITY=$2
+VM_IMAGE=${3:-Canonical:ubuntu-24_04-lts:server:latest}
 VM_USER=${AZURE_VM_USER:-azureuser}
 
 if ! [ -f ~/.ssh/id_rsa ]; then
     ssh-keygen -t rsa -b 2048 -f ~/.ssh/id_rsa -N ""
 fi
 
-if [ -z "$2" ]; then
+if [ -z "$3" ]; then
    echo "Assuming generalized image"
    VM_EXTRA_ARGS="--admin-username $VM_USER --ssh-key-value ~/.ssh/id_rsa.pub"
 else

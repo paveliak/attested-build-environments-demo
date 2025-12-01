@@ -11,7 +11,7 @@ az group create --resource-group $AZURE_RESOURCE_GROUP --location $AZURE_LOCATIO
 
 echo "Creating image VM..."
 IMAGE_VM_NAME="${AZURE_VM_NAME}"
-$SCRIPTPATH/create-vm $IMAGE_VM_NAME
+$SCRIPTPATH/create-vm $IMAGE_VM_NAME Standard
 IMAGE_VM_ID=$(az vm show --resource-group $AZURE_RESOURCE_GROUP --name $IMAGE_VM_NAME | jq -r ".id")
 IP_ADDR=$($SCRIPTPATH/get-ip $IMAGE_VM_ID)
 $SCRIPTPATH/test-connectivity $IP_ADDR
@@ -37,7 +37,7 @@ az vm update --name $IMAGE_VM_NAME --resource-group $AZURE_RESOURCE_GROUP --os-d
 
 echo "Creating hasher VM..."
 HASHER_VM_NAME="${AZURE_VM_NAME}hash"
-$SCRIPTPATH/create-vm $HASHER_VM_NAME
+$SCRIPTPATH/create-vm $HASHER_VM_NAME TrustedLaunch
 HASHER_VM_ID=$(az vm show --resource-group $AZURE_RESOURCE_GROUP --name $HASHER_VM_NAME | jq -r ".id")
 IP_ADDR=$($SCRIPTPATH/get-ip $HASHER_VM_ID)
 $SCRIPTPATH/test-connectivity $IP_ADDR
