@@ -70,7 +70,8 @@ jobs:
       run: |
         build-azure/build.sh
         IMAGE_ID=$(az sig image-definition show --resource-group $AZURE_RESOURCE_GROUP --gallery-name $AZURE_GALLERY_NAME --gallery-image-name $AZURE_IMAGE_DEFINITION | jq -r ".id")
-        echo "image_id=${IMAGE_ID}" >> $GITHUB_OUTPUT
+        echo "Image ID: $IMAGE_ID"
+        echo "image_id=$IMAGE_ID" >> $GITHUB_OUTPUT
 
     - name: Upload artifacts
       uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
