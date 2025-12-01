@@ -36,8 +36,6 @@ jobs:
   image:
     needs: prep
     runs-on: ubuntu-latest
-    outputs:
-      image_id: ${{ steps.build.outputs.image_id }}
 
     steps:
     - name: Checkout
@@ -57,7 +55,6 @@ jobs:
         subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
 
     - name: Build Azure VM
-      id: build
       env:
         AZURE_SUBSCRIPTION_ID: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
         AZURE_RESOURCE_GROUP: ${{ secrets.AZURE_RESOURCE_GROUP }}
@@ -69,9 +66,6 @@ jobs:
         SSH_KEYS_URL: https://github.com/${{ github.actor }}.keys
       run: |
         build-azure/build.sh
-        IMAGE_ID=$(az sig image-definition show --resource-group $AZURE_RESOURCE_GROUP --gallery-name $AZURE_GALLERY_NAME --gallery-image-name $AZURE_IMAGE_DEFINITION | jq -r ".id")
-        echo "Image ID: $IMAGE_ID"
-        echo "image_id=$IMAGE_ID" >> $GITHUB_OUTPUT
 
     - name: Upload artifacts
       uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
@@ -105,6 +99,8 @@ jobs:
         AZURE_RESOURCE_GROUP: ${{ secrets.AZURE_RESOURCE_GROUP }}
         AZURE_LOCATION: ${{ secrets.AZURE_LOCATION }}
         AZURE_VM_NAME: ${{ secrets.AZURE_VM_NAME }}
-        IMAGE_ID: ${{ needs.image.outputs.image_id }}
+        AZURE_GALLERY_NAME: ${{ secrets.AZURE_VM_NAME }}_gallery
+        AZURE_IMAGE_DEFINITION: ${{ secrets.AZURE_VM_NAME }}_image
       run: |
+        IMAGE_ID=$(az sig image-definition show --resource-group $AZURE_RESOURCE_GROUP --gallery-name $AZURE_GALLERY_NAME --gallery-image-name $AZURE_IMAGE_DEFINITION | jq -r ".id")
         build-azure/attest.sh
