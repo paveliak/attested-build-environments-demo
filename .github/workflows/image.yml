@@ -102,5 +102,4 @@ jobs:
         AZURE_GALLERY_NAME: ${{ secrets.AZURE_VM_NAME }}_gallery
         AZURE_IMAGE_DEFINITION: ${{ secrets.AZURE_VM_NAME }}_image
       run: |
-        IMAGE_ID=$(az sig image-definition show --resource-group $AZURE_RESOURCE_GROUP --gallery-name $AZURE_GALLERY_NAME --gallery-image-name $AZURE_IMAGE_DEFINITION | jq -r ".id")
         build-azure/attest.sh
