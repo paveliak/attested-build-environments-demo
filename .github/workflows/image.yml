@@ -81,7 +81,7 @@ jobs:
         path: attest-azure
 
     - run: |
-        ls -al attest-azure
+        chmod +x ./attest-azure/AttestationClient
         sudo ./attest-azure/AttestationClient -o token
 
     - name: Login to Azure
