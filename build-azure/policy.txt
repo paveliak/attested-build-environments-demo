@@ -1,0 +1,11 @@
+version= 1.0;
+authorizationrules
+{
+    [type=="x-ms-azurevm-default-securebootkeysvalidated", value==false] => deny();
+    [type=="x-ms-azurevm-debuggersdisabled", value==false] => deny();
+    [type=="secureboot", value==false] => deny();
+    [type=="x-ms-azurevm-signingdisabled", value==false] => deny();
+    [type=="x-ms-azurevm-dbvalidated", value==false] => deny();
+    [type=="x-ms-azurevm-dbxvalidated", value==false] => deny();
+    => permit();
+};

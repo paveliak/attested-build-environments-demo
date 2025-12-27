@@ -33,8 +33,39 @@ jobs:
         name: image-attestation
         path: build-azure/image-attestation
 
+  maa:
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v4
+      with:
+        repository: Azure/confidential-computing-cvm-guest-attestation
+        path: maa-guest-attestation
+
+    - name: Build MAA Client
+      run: |
+        cd maa-guest-attestation
+        chmod +x ./client-library/src/Attestation/pre-requisites.sh
+        chmod +x ./client-library/src/Attestation/build.sh
+        chmod +x ./client-library/src/Attestation/build_x86_64.sh
+        chmod +x ./client-library/src/Attestation/run_tests.sh
+        chmod +x ./client-library/src/Attestation/AttestationClient/lib/DynamicLibrary/createDebPackage.sh
+
+        cd cvm-attestation-sample-app
+        chmod +x ./ClientLibBuildAndInstall.sh
+        sudo ./ClientLibBuildAndInstall.sh
+        cmake .
+        make
+        ls -al
+
+    - name: Upload guest attestation tool
+      uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+      with:
+        name: guest-attestation
+        path: maa-guest-attestation/AttestationClient
+
   image:
-    needs: prep
+    needs: [prep,maa]
     runs-on: ubuntu-latest
 
     steps:
@@ -79,7 +110,7 @@ jobs:
         subject-path: uki.efi
     
   attest:
-    needs: [prep, image]
+    needs: [image]
     runs-on: ubuntu-latest
 
     steps:
