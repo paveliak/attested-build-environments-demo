@@ -16,7 +16,7 @@ ATTEST_PROVIDER_ID=$(az attestation show --resource-group $AZURE_RESOURCE_GROUP 
 ATTEST_PROVIDER_URL=$(az attestation show --resource-group $AZURE_RESOURCE_GROUP --name $ATTEST_PROVIDER_NAME | jq -r ".attestUri")
 
 echo "Setting attestation policy..."
-POLICY_B64=$(cat policy.txt | b64url)
+POLICY_B64=$(cat $SCRIPTPATH/policy.txt | b64url)
 JWT_HEADER="{\"alg\":\"none\",\"typ\":\"JWT\"}"
 JWT_BODY="{\"AttestationPolicy\":\"$POLICY_B64\"}"
 JWT_HEADER_B64=$(echo -n "$JWT_HEADER" | b64url)
