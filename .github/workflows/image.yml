@@ -81,6 +81,8 @@ jobs:
         path: attest-azure
 
     - run: |
+        curl -LO https://packages.microsoft.com/repos/azurecore/pool/main/a/azguestattestation1/azguestattestation1_1.1.2_amd64.deb
+        sudo dpkg -i azguestattestation1_1.1.2_amd64.deb
         chmod +x ./attest-azure/AttestationClient
         sudo ./attest-azure/AttestationClient -o token
 
