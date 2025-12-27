@@ -40,23 +40,32 @@ jobs:
     - uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v4
       with:
         repository: Azure/confidential-computing-cvm-guest-attestation
-        path: maa-guest-attestation
+
+    - name: Install dependencies
+      run: |
+        sudo apt-get update
+        sudo apt-get install build-essential libcurl4-openssl-dev libjsoncpp-dev libboost-all-dev cmake nlohmann-json3-dev
+        curl -LO https://packages.microsoft.com/repos/azurecore/pool/main/a/azguestattestation1/azguestattestation1_1.1.2_amd64.deb
+        sudo dpkg -i azguestattestation1_1.1.2_amd64.deb
 
     - name: Build MAA Client
       run: |
-        cd maa-guest-attestation
-        chmod +x ./client-library/src/Attestation/pre-requisites.sh
-        chmod +x ./client-library/src/Attestation/build.sh
-        chmod +x ./client-library/src/Attestation/build_x86_64.sh
-        chmod +x ./client-library/src/Attestation/run_tests.sh
-        chmod +x ./client-library/src/Attestation/AttestationClient/lib/DynamicLibrary/createDebPackage.sh
-
         cd cvm-attestation-sample-app
-        chmod +x ./ClientLibBuildAndInstall.sh
-        sudo ./ClientLibBuildAndInstall.sh
         cmake .
         make
         ls -al
+
+        #chmod +x ./client-library/src/Attestation/pre-requisites.sh
+        #chmod +x ./client-library/src/Attestation/build.sh
+        #chmod +x ./client-library/src/Attestation/build_x86_64.sh
+        #chmod +x ./client-library/src/Attestation/run_tests.sh
+        #chmod +x ./client-library/src/Attestation/AttestationClient/lib/DynamicLibrary/createDebPackage.sh
+
+        #cd cvm-attestation-sample-app
+        #chmod +x ./ClientLibBuildAndInstall.sh
+        #sudo ./ClientLibBuildAndInstall.sh
+        #cmake .
+        #make
 
     - name: Upload guest attestation tool
       uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
