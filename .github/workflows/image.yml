@@ -114,8 +114,8 @@ jobs:
     - if: ${{ failure() }}
       uses: paveliak/debug-it@main
       with:
-        tenant-id: ${{ secrets.AZURE_TENANT_ID }}
-        client-id: ${{ secrets.AZURE_CLIENT_ID }}
+        tenant-id: ${{ secrets.TENANT_ID }}
+        client-id: ${{ secrets.CLIENT_ID }}
 
   attest:
     needs: [image]
