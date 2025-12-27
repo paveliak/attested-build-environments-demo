@@ -16,6 +16,9 @@ echo Installing software desired for the eventual image
 apt-get update
 apt-get install -y golang tpm2-tools
 
+curl -LO https://packages.microsoft.com/repos/azurecore/pool/main/a/azguestattestation1/azguestattestation1_1.1.2_amd64.deb
+dpkg -i azguestattestation1_1.1.2_amd64.deb
+
 echo "Setting public keys from $SSH_KEYS_URL"
 mkdir -p /home/$VM_USER/.ssh
 touch /home/$VM_USER/.ssh/authorized_keys
