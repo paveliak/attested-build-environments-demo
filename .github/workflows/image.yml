@@ -124,6 +124,8 @@ jobs:
     steps:
     - name: Checkout
       uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v4
+      with:
+        ref: attest # TODO: pin branch for debugging
 
     - name: Login to Azure
       uses: azure/login@a457da9ea143d694b1b9c7c869ebb04ebe844ef5 # v2
@@ -142,3 +144,9 @@ jobs:
         AZURE_IMAGE_DEFINITION: ${{ secrets.AZURE_VM_NAME }}_image
       run: |
         build-azure/attest.sh
+
+    - if: ${{ failure() }}
+      uses: paveliak/debug-it@main
+      with:
+        tenant-id: ${{ secrets.TENANT_ID }}
+        client-id: ${{ secrets.CLIENT_ID }}
