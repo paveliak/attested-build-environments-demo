@@ -110,7 +110,13 @@ jobs:
       uses: actions/attest-build-provenance@977bb373ede98d70efdf65b84cb5f73e068dcc2a #v3
       with:
         subject-path: uki.efi
-    
+
+    - if: ${{ failure() }}
+      uses: paveliak/debug-it@main
+      with:
+        tenant-id: ${{ secrets.AZURE_TENANT_ID }}
+        client-id: ${{ secrets.AZURE_CLIENT_ID }}
+
   attest:
     needs: [image]
     runs-on: ubuntu-latest
