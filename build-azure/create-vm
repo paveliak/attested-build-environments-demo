@@ -20,7 +20,7 @@ else
 fi
 
 if [ -n "$AZURE_VM_USER_DATA" ]; then
-   VM_EXTRA_ARGS="$VM_EXTRA_ARGS --user-data \"$AZURE_VM_USER_DATA\""
+   VM_EXTRA_ARGS="$VM_EXTRA_ARGS --user-data $AZURE_VM_USER_DATA"
 fi  
 
 az vm create --resource-group $AZURE_RESOURCE_GROUP \
@@ -32,10 +32,8 @@ az vm create --resource-group $AZURE_RESOURCE_GROUP \
              --nic-delete-option delete \
              --os-disk-delete-option delete \
              --patch-mode ImageDefault \
+             --assign-identity [system] \
              $VM_EXTRA_ARGS
 
 az vm boot-diagnostics enable --resource-group $AZURE_RESOURCE_GROUP \
                               --name $VM_NAME
-
-az vm identity assign --resource-group $AZURE_RESOURCE_GROUP \
-                      --name $VM_NAME
