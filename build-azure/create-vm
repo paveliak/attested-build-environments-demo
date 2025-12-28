@@ -19,6 +19,10 @@ else
    VM_EXTRA_ARGS="--specialized"
 fi
 
+if [ -n "$AZURE_VM_USER_DATA" ]; then
+   VM_EXTRA_ARGS="$VM_EXTRA_ARGS --user-data "$AZURE_VM_USER_DATA"
+fi  
+
 az vm create --resource-group $AZURE_RESOURCE_GROUP \
              --name $VM_NAME \
              --image $VM_IMAGE \

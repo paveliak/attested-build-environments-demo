@@ -18,6 +18,7 @@ apt-get install -y golang tpm2-tools
 
 curl -LO https://packages.microsoft.com/repos/azurecore/pool/main/a/azguestattestation1/azguestattestation1_1.1.2_amd64.deb
 dpkg -i azguestattestation1_1.1.2_amd64.deb
+rm azguestattestation1_1.1.2_amd64.deb
 
 echo "Setting public keys from $SSH_KEYS_URL"
 mkdir -p /home/$VM_USER/.ssh
@@ -34,6 +35,14 @@ rm /etc/kernel/postinst.d/initramfs-tools
 echo Copying attestation utilities to sbin
 chmod +x image-attestation
 cp image-attestation /usr/sbin/image-attestation
+chmod +x AttestationClient
+cp AttestationClient /usr/sbin/AttestationClient
+
+echo Installing attestation service
+cp "$SCRIPTPATH"/../scripts/attest.service /etc/systemd/system/attest.service
+cp "$SCRIPTPATH"/../scripts/attest-linux-vm.sh /usr/sbin/attest-linux-vm.sh
+systemctl daemon-reload
+systemctl enable attest.service
 
 echo Installing enlightened initramfs scripts and generate initramfs
 TMP_DRIVE_PATH=$(mktemp -d)

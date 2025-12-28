@@ -1,0 +1,13 @@
+[Unit]
+Description=VM attestation service
+After=network.target
+
+[Service]
+Type=oneshot
+ExecStart=/usr/sbin/attest-linux-vm.sh
+RemainAfterExit=true
+Restart=on-failure
+RestartSec=5
+
+[Install]
+WantedBy=multi-user.target
