@@ -69,16 +69,29 @@ az disk delete --id $SWAP_DISK_ID --yes
 
 echo "Creating image version..."
 STORAGE_ACCOUNT_NAME="${AZURE_VM_NAME}storage"
+CONTAINER_NAME="vhd"
+BLOB_NAME="disk.vhd"
+DISK_URL="https://$STORAGE_ACCOUNT_NAME.blob.core.windows.net/$CONTAINER_NAME/$BLOB_NAME"
+
 az storage account create --name $STORAGE_ACCOUNT_NAME --resource-group $AZURE_RESOURCE_GROUP --location $AZURE_LOCATION --sku Standard_LRS --kind StorageV2
-az storage container create --name vhd --account-name $STORAGE_ACCOUNT_NAME --auth-mode login
+az storage container create --name vhd --account-name $STORAGE_ACCOUNT_NAME
 STORAGE_ACCOUNT_ID=$(az storage account show --name $STORAGE_ACCOUNT_NAME --resource-group $AZURE_RESOURCE_GROUP | jq -r ".id")
-DISK_URL="https://$STORAGE_ACCOUNT_NAME.blob.core.windows.net/vhd/disk.vhd"
 
 DISK_SAS=$(az disk grant-access --id $DISK_ID --duration-in-seconds 86400 --access-level Read | jq -r ".accessSAS")
 
-export AZCOPY_AUTO_LOGIN_TYPE=AZCLI
-export AZCOPY_TENANT_ID=$AZURE_TENANT_ID
-azcopy cp "$DISK_SAS" "$DISK_URL"
+az storage blob copy start --source-uri "$DISK_SAS" --account-name $STORAGE_ACCOUNT_NAME --destination-container $CONTAINER_NAME --destination-blob $BLOB_NAME
+while true; do
+  STATUS=$(az storage blob show --account-name $STORAGE_ACCOUNT_NAME --container-name $CONTAINER_NAME --name $BLOB_NAME | jq -r ".properties.copy.status")
+  echo "Copy status: $STATUS"
+  if [ "$STATUS" == "success" ]; then
+    echo "Copy completed!"
+    break
+  elif [ "$STATUS" == "failed" ]; then
+    echo "Copy failed."
+    exit 1
+  fi
+  sleep 10
+done
 
 az deployment group create \
   --resource-group $AZURE_RESOURCE_GROUP \
