@@ -67,7 +67,7 @@ echo "Attaching OS disk back..."
 az vm update --name $IMAGE_VM_NAME --resource-group $AZURE_RESOURCE_GROUP --os-disk $DISK_ID
 az disk delete --id $SWAP_DISK_ID --yes
 
-echo "Creating image version..."
+echo "Creating VHD blob..."
 STORAGE_ACCOUNT_NAME="${AZURE_VM_NAME}storage"
 CONTAINER_NAME="vhd"
 BLOB_NAME="disk.vhd"
@@ -93,6 +93,7 @@ while true; do
   sleep 10
 done
 
+echo "Creating image version..."
 az deployment group create \
   --resource-group $AZURE_RESOURCE_GROUP \
   --template-file "$SCRIPTPATH/image.bicep" \

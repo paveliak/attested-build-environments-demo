@@ -25,9 +25,10 @@ fi
 
 # Intel TPM
 VM_SIZE="Standard_D4ds_v5"
-if [ "$VM_SECURITY" == "ConfidentialVM" ]; then
+if [ "$VM_SECURITY" = "ConfidentialVM" ]; then
   # AMD SEV-SNP
   VM_SIZE="Standard_DC2ads_v5"
+  VM_EXTRA_ARGS="$VM_EXTRA_ARGS --os-disk-security-encryption-type VMGuestStateOnly --enable-vtpm --enable-secure-boot"
 fi
 
 az vm create --resource-group $AZURE_RESOURCE_GROUP \
