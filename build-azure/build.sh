@@ -77,7 +77,7 @@ DISK_URL="https://$STORAGE_ACCOUNT_NAME.blob.core.windows.net/vhd/disk.vhd"
 DISK_SAS=$(az disk grant-access --id $DISK_ID --duration-in-seconds 86400 --access-level Read | jq -r ".accessSAS")
 
 export AZCOPY_AUTO_LOGIN_TYPE=AZCLI
-export AZCOPY_TENANT_ID=1fe6075c-a887-493e-a088-77e762c7340c
+export AZCOPY_TENANT_ID=$AZURE_TENANT_ID
 azcopy cp "$DISK_SAS" "$DISK_URL"
 
 az deployment group create \
