@@ -23,7 +23,7 @@ resource imageDef 'Microsoft.Compute/galleries/images@2024-03-03' = {
     features: [
       {
         name: 'SecurityType'
-        value: 'TrustedLaunchSupported'
+        value: 'TrustedLaunchAndConfidentialVmSupported'
       }
     ]
     osType: 'Linux'

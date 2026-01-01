@@ -21,12 +21,17 @@ fi
 
 if [ -n "$AZURE_VM_USER_DATA" ]; then
    VM_EXTRA_ARGS="$VM_EXTRA_ARGS --user-data $AZURE_VM_USER_DATA"
-fi  
+fi
+
+VM_SIZE="Standard_D4ds_v5"
+if [ "$VM_SECURITY" == "ConfidentialVM" ]; then
+  VM_SIZE="Standard_DC2ads_v5"
+fi
 
 az vm create --resource-group $AZURE_RESOURCE_GROUP \
              --name $VM_NAME \
              --image $VM_IMAGE \
-             --size Standard_D4ds_v5 \
+             --size $VM_SIZE \
              --storage-sku StandardSSD_LRS \
              --security-type $VM_SECURITY \
              --nic-delete-option delete \

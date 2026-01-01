@@ -38,7 +38,7 @@ az vm update --name $IMAGE_VM_NAME --resource-group $AZURE_RESOURCE_GROUP --os-d
 
 echo "Creating hasher VM..."
 HASHER_VM_NAME="${AZURE_VM_NAME}hash"
-$SCRIPTPATH/create-vm $HASHER_VM_NAME TrustedLaunch
+$SCRIPTPATH/create-vm $HASHER_VM_NAME Standard
 HASHER_VM_ID=$(az vm show --resource-group $AZURE_RESOURCE_GROUP --name $HASHER_VM_NAME | jq -r ".id")
 IP_ADDR=$($SCRIPTPATH/get-ip $HASHER_VM_ID)
 $SCRIPTPATH/test-connectivity $IP_ADDR
