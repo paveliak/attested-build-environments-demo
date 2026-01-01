@@ -1,7 +1,23 @@
 name: Image Build
 
 on:
-  workflow_dispatch
+  workflow_dispatch:
+    inputs:
+      AZURE_LOCATION:
+        description: "Azure region"
+        type: string
+        required: true
+        default: "eastus"
+
+      SECURITY_TYPE:
+        description: "VM security type"
+        type: choice
+        required: true
+        default: "ConfidentialVM"
+        options:
+          - Standard
+          - TrustedLaunch
+          - ConfidentialVM
 
 permissions:
   id-token: write
@@ -91,7 +107,7 @@ jobs:
       env:
         AZURE_SUBSCRIPTION_ID: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
         AZURE_RESOURCE_GROUP: ${{ secrets.AZURE_RESOURCE_GROUP }}
-        AZURE_LOCATION: ${{ secrets.AZURE_LOCATION }}
+        AZURE_LOCATION: ${{ inputs.AZURE_LOCATION }}
         AZURE_VM_NAME: ${{ secrets.AZURE_VM_NAME }}
         AZURE_GALLERY_NAME: ${{ secrets.AZURE_VM_NAME }}_gallery
         AZURE_IMAGE_DEFINITION: ${{ secrets.AZURE_VM_NAME }}_image
@@ -110,12 +126,6 @@ jobs:
       uses: actions/attest-build-provenance@977bb373ede98d70efdf65b84cb5f73e068dcc2a #v3
       with:
         subject-path: uki.efi
-
-    - if: ${{ failure() }}
-      uses: paveliak/debug-it@main
-      with:
-        tenant-id: ${{ secrets.TENANT_ID }}
-        client-id: ${{ secrets.CLIENT_ID }}
 
   attest:
     needs: [image]
@@ -138,15 +148,10 @@ jobs:
       env:
         AZURE_SUBSCRIPTION_ID: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
         AZURE_RESOURCE_GROUP: ${{ secrets.AZURE_RESOURCE_GROUP }}
-        AZURE_LOCATION: ${{ secrets.AZURE_LOCATION }}
+        AZURE_LOCATION: ${{ inputs.AZURE_LOCATION }}
         AZURE_VM_NAME: ${{ secrets.AZURE_VM_NAME }}
         AZURE_GALLERY_NAME: ${{ secrets.AZURE_VM_NAME }}_gallery
         AZURE_IMAGE_DEFINITION: ${{ secrets.AZURE_VM_NAME }}_image
+        SECURITY_TYPE: ${{ inputs.SECURITY_TYPE }}
       run: |
         build-azure/attest.sh
-
-    - if: ${{ failure() }}
-      uses: paveliak/debug-it@main
-      with:
-        tenant-id: ${{ secrets.TENANT_ID }}
-        client-id: ${{ secrets.CLIENT_ID }}

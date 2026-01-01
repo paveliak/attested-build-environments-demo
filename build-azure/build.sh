@@ -68,10 +68,22 @@ az vm update --name $IMAGE_VM_NAME --resource-group $AZURE_RESOURCE_GROUP --os-d
 az disk delete --id $SWAP_DISK_ID --yes
 
 echo "Creating image version..."
+STORAGE_ACCOUNT_NAME="${AZURE_VM_NAME}storage"
+az storage account create --name $STORAGE_ACCOUNT_NAME --resource-group $AZURE_RESOURCE_GROUP --location $AZURE_LOCATION --sku Standard_LRS --kind StorageV2
+az storage container create --name vhd --account-name $STORAGE_ACCOUNT_NAME --auth-mode login
+STORAGE_ACCOUNT_ID=$(az storage account show --name $STORAGE_ACCOUNT_NAME --resource-group $AZURE_RESOURCE_GROUP | jq -r ".id")
+DISK_URL="https://$STORAGE_ACCOUNT_NAME.blob.core.windows.net/vhd/disk.vhd"
+
+DISK_SAS=$(az disk grant-access --id $DISK_ID --duration-in-seconds 86400 --access-level Read | jq -r ".accessSAS")
+
+export AZCOPY_AUTO_LOGIN_TYPE=AZCLI
+export AZCOPY_TENANT_ID=1fe6075c-a887-493e-a088-77e762c7340c
+azcopy cp "$DISK_SAS" "$DISK_URL"
+
 az deployment group create \
   --resource-group $AZURE_RESOURCE_GROUP \
   --template-file "$SCRIPTPATH/image.bicep" \
-  --parameters location="$AZURE_LOCATION" galleryName="$AZURE_GALLERY_NAME" imageDefinitionName="$AZURE_IMAGE_DEFINITION" imageVersion="$AZURE_IMAGE_VERSION" sourceId="$IMAGE_VM_ID" mokCertBase64="$MOK_BASE64"
+  --parameters location="$AZURE_LOCATION" galleryName="$AZURE_GALLERY_NAME" imageDefinitionName="$AZURE_IMAGE_DEFINITION" imageVersion="$AZURE_IMAGE_VERSION" storageAccountId="$STORAGE_ACCOUNT_ID" blobUrl="$DISK_URL" mokCertBase64="$MOK_BASE64"
 
 echo "Deleting image VM..."
 az vm delete --id $IMAGE_VM_ID --yes

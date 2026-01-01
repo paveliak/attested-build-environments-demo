@@ -32,7 +32,7 @@ IMAGE_ID=$(az sig image-definition show --resource-group $AZURE_RESOURCE_GROUP -
 
 echo "Creating attested VM..."
 export AZURE_VM_USER_DATA="{\"attest_url\":\"$ATTEST_PROVIDER_URL\"}"
-$SCRIPTPATH/create-vm $ATTEST_VM_NAME ConfidentialVM $IMAGE_ID
+$SCRIPTPATH/create-vm $ATTEST_VM_NAME $SECURITY_TYPE $IMAGE_ID
 ATTEST_VM_ID=$(az vm show --resource-group $AZURE_RESOURCE_GROUP --name $ATTEST_VM_NAME | jq -r ".id")
 ATTEST_PRINCIPAL_ID=$(az vm show --resource-group $AZURE_RESOURCE_GROUP --name $ATTEST_VM_NAME | jq -r ".identity.principalId")
 az role assignment create --assignee $ATTEST_PRINCIPAL_ID --role "Attestation Reader" --scope $ATTEST_PROVIDER_ID
