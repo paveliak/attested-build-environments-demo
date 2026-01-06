@@ -33,8 +33,31 @@ openssl req -new -x509 -newkey rsa:2048 -keyout MOK.key -out MOK.pem -days 365 -
 sudo ukify build --linux="/mnt/boot/vmlinuz-$UNAME" --initrd="/mnt/boot/initrd.img-$UNAME" --uname=$UNAME --cmdline="$PROC_CMDLINE" --output=uki.efi --signtool=sbsign --secureboot-private-key=MOK.key --secureboot-certificate=MOK.pem
 sudo cp uki.efi /mnt/uefi/EFI/BOOT/BOOTX64.EFI
 
-#echo "Printing out PCRs"
-#sudo tpm2_pcrread
+echo "Computing expected PCR4"
+echo -n "Calling EFI Application from Boot Option" | sha256sum | awk '{print $1}' > hash1.hex
+head -c 4 < /dev/zero | sha256sum | awk '{print $1}' > hash2.hex
+sudo hash-to-efi-sig-list uki.efi ignore | awk '{print $3}' > hash3.hex
+sudo hash-to-efi-sig-list "/mnt/boot/vmlinuz-$UNAME" ignore | awk '{print $3}' > hash4.hex
+
+for file in hash?.hex; do
+  echo "===== $file ====="
+  cat "$file"
+  xxd -r -p "$file" > "${file%.*}.bin"
+done
+
+cat hash1.bin hash2.bin > concatenated.bin
+sha256sum concatenated.bin | awk '{print $1}' > hash12.hex
+xxd -r -p hash12.hex > hash12.bin
+
+cat hash12.bin hash3.bin > concatenated.bin
+sha256sum concatenated.bin | awk '{print $1}' > hash123.hex
+xxd -r -p hash123.hex > hash123.bin
+
+cat hash123.bin hash4.bin > concatenated.bin
+sha256sum concatenated.bin | awk '{print $1}' > hash1234.hex
+xxd -r -p hash1234.hex > hash1234.bin
+
+echo "PCR4: $(cat hash1234.hex)"
 
 sudo umount /mnt/uefi
 sudo umount /mnt/boot

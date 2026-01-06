@@ -6,6 +6,9 @@ echo Installing software necessary for verity measurement
 sudo apt update
 sudo apt-get install -y expect cryptsetup systemd-boot systemd-ukify tpm2-tools
 
+chmod +x hash-to-efi-sig-list
+sudo cp hash-to-efi-sig-list /usr/sbin/hash-to-efi-sig-list
+
 echo Patching up fstab
 # Use UEFI label for the EFI partition instead of UUID
 sed -i 's/UUID=[^\s]\+\(\s\+\/boot\/efi\)/LABEL=UEFI\1/' /etc/fstab
