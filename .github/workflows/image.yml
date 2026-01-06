@@ -76,8 +76,31 @@ jobs:
         name: guest-attestation
         path: cvm-attestation-sample-app/AttestationClient
 
+  efitools:
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v4
+      with:
+        repository: vathpela/efitools
+
+    - name: Install dependencies
+      run: |
+        sudo apt-get update
+        sudo apt-get install gnu-efi libfile-slurp-perl
+
+    - name: Build hash-to-efi-sig-list
+      run: |
+        make hash-to-efi-sig-list
+
+    - name: Upload hash-to-efi-sig-list
+      uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+      with:
+        name: hash-to-efi-sig-list
+        path: ./hash-to-efi-sig-list
+
   image:
-    needs: [prep,maa]
+    needs: [prep,maa,efitools]
     runs-on: ubuntu-latest
 
     steps:
