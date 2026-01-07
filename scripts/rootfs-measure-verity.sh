@@ -6,7 +6,7 @@ pcr_extend_chain() {
     PCR_BIN=$(mktemp)
     HASH_BIN=$(mktemp)
 
-    PCR=$(printf '%064s' 0)
+    PCR="0000000000000000000000000000000000000000000000000000000000000000"
     for hash in "$@"; do
         echo "$PCR" | xxd -r -p > $PCR_BIN
         echo "$hash" | xxd -r -p > $HASH_BIN
