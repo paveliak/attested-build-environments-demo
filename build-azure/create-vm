@@ -23,12 +23,23 @@ if [ -n "$AZURE_VM_USER_DATA" ]; then
    VM_EXTRA_ARGS="$VM_EXTRA_ARGS --user-data $AZURE_VM_USER_DATA"
 fi
 
-# Intel TPM
-VM_SIZE="Standard_D4ds_v5"
-if [ "$VM_SECURITY" = "ConfidentialVM" ]; then
+if [ "$VM_SECURITY" = "SEV-SNP" ]; then
   # AMD SEV-SNP
+  VM_SECURITY="ConfidentialVM"
   VM_SIZE="Standard_DC2ads_v5"
   VM_EXTRA_ARGS="$VM_EXTRA_ARGS --os-disk-security-encryption-type VMGuestStateOnly --enable-vtpm --enable-secure-boot"
+elif [ "$VM_SECURITY" = "TDX" ]; then
+  # Intel TDX
+  VM_SECURITY="ConfidentialVM"
+  VM_SIZE="Standard_DC2eds_v5"
+  VM_EXTRA_ARGS="$VM_EXTRA_ARGS --os-disk-security-encryption-type NonPersistedTPM --enable-vtpm --enable-secure-boot"
+elif [ "$VM_SECURITY" = "vTPM" ]; then
+  # TrustedLaunch
+  VM_SECURITY="TrustedLaunch"
+  VM_SIZE="Standard_D4ds_v5"
+else
+  VM_SECURITY="Standard"
+  VM_SIZE="Standard_D4ds_v5"
 fi
 
 az vm create --resource-group $AZURE_RESOURCE_GROUP \

@@ -13,11 +13,12 @@ on:
         description: "VM security type"
         type: choice
         required: true
-        default: "ConfidentialVM"
+        default: "vTPM"
         options:
-          - Standard
-          - TrustedLaunch
-          - ConfidentialVM
+          - None
+          - vTPM
+          - SEV-SNP
+          - TDX
 
 permissions:
   id-token: write
