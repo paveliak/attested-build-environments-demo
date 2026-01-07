@@ -2,6 +2,19 @@
 
 set -e
 
+pcr_extend_chain() {
+    PCR_BIN=$(mktemp)
+    HASH_BIN=$(mktemp)
+
+    PCR=$(printf '%064s' 0)
+    for hash in "$@"; do
+        echo "$PCR" | xxd -r -p > $PCR_BIN
+        echo "$hash" | xxd -r -p > $HASH_BIN
+        PCR=$(cat $PCR_BIN $HASH_BIN | sha256sum | awk '{print $1}')
+    done
+    echo "$PCR"
+}
+
 # TODO: pass it into this script as parameter
 LUN_ID="0"
 
@@ -34,30 +47,11 @@ sudo ukify build --linux="/mnt/boot/vmlinuz-$UNAME" --initrd="/mnt/boot/initrd.i
 sudo cp uki.efi /mnt/uefi/EFI/BOOT/BOOTX64.EFI
 
 echo "Computing expected PCR4"
-echo -n "Calling EFI Application from Boot Option" | sha256sum | awk '{print $1}' > hash1.hex
-head -c 4 < /dev/zero | sha256sum | awk '{print $1}' > hash2.hex
-sudo hash-to-efi-sig-list uki.efi ignore | awk '{print $3}' > hash3.hex
-sudo hash-to-efi-sig-list "/mnt/boot/vmlinuz-$UNAME" ignore | awk '{print $3}' > hash4.hex
-
-for file in hash?.hex; do
-  echo "===== $file ====="
-  cat "$file"
-  xxd -r -p "$file" > "${file%.*}.bin"
-done
-
-cat hash1.bin hash2.bin > concatenated.bin
-sha256sum concatenated.bin | awk '{print $1}' > hash12.hex
-xxd -r -p hash12.hex > hash12.bin
-
-cat hash12.bin hash3.bin > concatenated.bin
-sha256sum concatenated.bin | awk '{print $1}' > hash123.hex
-xxd -r -p hash123.hex > hash123.bin
-
-cat hash123.bin hash4.bin > concatenated.bin
-sha256sum concatenated.bin | awk '{print $1}' > hash1234.hex
-xxd -r -p hash1234.hex > hash1234.bin
-
-echo "PCR4: $(cat hash1234.hex)"
+HASH1=$(echo -n "Calling EFI Application from Boot Option" | sha256sum | awk '{print $1}')
+HASH2=$(head -c 4 < /dev/zero | sha256sum | awk '{print $1}')
+HASH3=$(sudo hash-to-efi-sig-list uki.efi ignore | awk '{print $3}')
+PCR4=$(pcr_extend_chain $HASH1 $HASH2 $HASH3)
+echo "PCR4: $PCR4"
 
 sudo umount /mnt/uefi
 sudo umount /mnt/boot
