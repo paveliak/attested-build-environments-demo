@@ -32,7 +32,7 @@ elif [ "$VM_SECURITY" = "TDX" ]; then
   # Intel TDX
   VM_SECURITY="ConfidentialVM"
   VM_SIZE="Standard_DC2eds_v5"
-  VM_EXTRA_ARGS="$VM_EXTRA_ARGS --os-disk-security-encryption-type NonPersistedTPM --enable-vtpm --enable-secure-boot"
+  VM_EXTRA_ARGS="$VM_EXTRA_ARGS --os-disk-security-encryption-type VMGuestStateOnly --enable-vtpm --enable-secure-boot"
 elif [ "$VM_SECURITY" = "vTPM" ]; then
   # TrustedLaunch
   VM_SECURITY="TrustedLaunch"
